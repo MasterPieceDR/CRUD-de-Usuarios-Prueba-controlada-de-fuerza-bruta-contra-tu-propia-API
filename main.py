@@ -15,6 +15,7 @@ bd: List[Usuario] = [
     Usuario(id=1, username="testuser", password="123", email="test@example.com"),
     Usuario(id=2, username="diegosantillan625@gmail.com", password="123456789", email="diegosantillan625@gmail.com"),
     Usuario(id=3, username="juanperez", password="abc123", email="test@yo.com"),
+    Usuario(id=4, username="diego", password="abc", email="yo@yo.com"),
 ]
 
 @app.get("/")
