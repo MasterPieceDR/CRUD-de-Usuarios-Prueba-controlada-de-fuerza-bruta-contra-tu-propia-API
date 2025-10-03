@@ -1,60 +1,52 @@
 # CRUD de Usuarios + Prueba controlada de Fuerza Bruta (entorno local)
 
-## Descripción
-Proyecto educativo que implementa una API REST con operaciones CRUD sobre usuarios (FastAPI) y un script Bash para realizar, de forma controlada y ética, una prueba de fuerza bruta contra el endpoint de autenticación propio. El objetivo es entender vulnerabilidades derivadas de credenciales débiles, medir impacto en un entorno controlado y aprender medidas de mitigación.
+## Descripción (breve)
+API educativa en **FastAPI** que implementa operaciones CRUD sobre usuarios y un script Bash que realiza pruebas controladas de fuerza bruta **únicamente** en `localhost`. Ejecutar siempre en entornos de laboratorio.
 
 > **Advertencia:** todas las pruebas deben ejecutarse exclusivamente en entornos de desarrollo/laboratorio y sobre servicios que usted controla. Ejecutar ataques contra terceros es ilegal y poco ético.
 
 ---
 
-## Estructura del repositorio
+## Estructura importante
 
 | Archivo / Carpeta | Descripción |
 |---|---|
-| `main.py` | Código de la API (FastAPI). Lista en memoria usada como "BD". |
+| `main.py` | API en FastAPI. Lista en memoria `bd` (simula base de datos). |
 | `bruteforce_api_local.sh` | Script Bash para probar fuerza bruta contra `POST /login` en `localhost`. |
-| `.gitignore` | Reglas para evitar subir entornos virtuales, cachés y archivos temporales. |
-| `README.md` | Documento de uso e instrucciones (este archivo). |
+| `.gitignore` | Reglas para excluir `venv/`, `__pycache__/`, y archivos temporales. |
+| `README.md` | Este documento (instrucciones y ejemplos). |
 
 ---
 
-## Requisitos (local)
+## Requisitos mínimos
 
-- Python 3.9+  
-- `pip`  
-- `bash` (Linux / macOS / Git Bash en Windows)  
-- `curl` (opcional, para pruebas)  
+| Elemento | Requisito |
+|---|---|
+| Python | 3.9+ |
+| pip | Recomendado actualizar a la última versión |
+| Shell | `bash` (Linux/macOS o Git Bash en Windows) |
+| curl | Opcional (para pruebas) |
+| Entorno virtual | Recomendado (`venv`) |
 
-Dependencias Python:
+Instalar dependencias (rápido):
 ```bash
 pip install fastapi uvicorn
-Se recomienda el uso de un entorno virtual (venv).
-
-Instalación y preparación
-Clonar el repositorio:
-
+Instalación rápida
 bash
 Copiar código
 git clone https://github.com/TU-USUARIO/mi-repo.git
 cd mi-repo
-Crear y activar entorno virtual (opcional pero recomendado):
 
-bash
-Copiar código
+# (Opcional) crear y activar entorno virtual
 python -m venv venv
 # Linux / macOS
 source venv/bin/activate
 # Windows (PowerShell)
 # .\venv\Scripts\Activate.ps1
-Instalar dependencias:
 
-bash
-Copiar código
 pip install --upgrade pip
 pip install fastapi uvicorn
-Ejecutar la API (entorno local)
-En la raíz del proyecto:
-
+Ejecutar la API (local)
 bash
 Copiar código
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
@@ -66,70 +58,92 @@ ReDoc: http://127.0.0.1:8000/redoc
 
 Modelo de datos (resumen)
 Campo	Tipo	Observaciones
-id	int	Identificador numérico del usuario
-username	str	Debe ser único en diseño ideal
-password	str	En el ejemplo se almacena en texto plano — no apto para producción
-email	str (opcional)	Correo electrónico del usuario
-is_active	bool	Indicador de cuenta activa/inactiva
+id	int	Identificador numérico
+username	str	Debe ser único (en diseño ideal)
+password	str	Texto plano en el ejemplo — no apto para producción
+email	str (opcional)	Correo del usuario
+is_active	bool	Cuenta activa/inactiva
 
-En la implementación actual los usuarios se guardan en la lista en memoria bd. Para persistencia, cambie a SQLite o similar.
+Actualmente los usuarios se almacenan en la lista en memoria bd. Para persistencia, migrar a SQLite u otra base de datos.
 
-Endpoints (resumen con ejemplo)
-Método	Ruta	Descripción	Ejemplo (curl)
-POST	/users/	Crear usuario (JSON).	curl -X POST "http://127.0.0.1:8000/users/" -H "Content-Type: application/json" -d '{"id":10,"username":"t","password":"p","email":"a@b.com","is_active":true}'
-GET	/users	Listar usuarios (skip, limit).	curl http://127.0.0.1:8000/users
-GET	/users/{id}	Obtener usuario por id.	curl http://127.0.0.1:8000/users/1
-PUT	/users/{id}	Actualizar usuario (no actualiza password en ejemplo).	curl -X PUT -H "Content-Type: application/json" -d '{"id":1,"username":"nuevo","password":"x","email":"e@e.com","is_active":true}' http://127.0.0.1:8000/users/1
-DELETE	/users/{id}	Eliminar usuario.	curl -X DELETE http://127.0.0.1:8000/users/1
-POST	/login	Autenticar (form-data username, password).	curl -X POST -F "username=t" -F "password=p" http://127.0.0.1:8000/login
+##Endpoints (resumen)
+Método	Ruta	Descripción
+POST	/users/	Crear usuario (JSON)
+GET	/users	Listar usuarios (skip, limit)
+GET	/users/{id}	Obtener usuario por id
+PUT	/users/{id}	Actualizar usuario (ejemplo no actualiza password)
+DELETE	/users/{id}	Eliminar usuario
+POST	/login	Autenticar (form-data: username, password)
 
-Script de fuerza bruta: bruteforce_api_local.sh
-Propósito
-Generar combinaciones de contraseñas y probarlas contra POST /login en localhost. Protecciones integradas obligan TARGET a 127.0.0.1 / localhost / ::1.
+Ejemplos (bloques de código)
+Crear usuario
+curl -X POST "http://127.0.0.1:8000/users/" \
+  -H "Content-Type: application/json" \
+  -d '{"id":10,"username":"t","password":"p","email":"a@b.com","is_active":true}'
+Listar usuarios
+curl http://127.0.0.1:8000/users
 
-Hacerlo ejecutable
-bash
-Copiar código
+Obtener usuario por id
+curl http://127.0.0.1:8000/users/1
+
+Actualizar usuario
+curl -X PUT "http://127.0.0.1:8000/users/1" \
+  -H "Content-Type: application/json" \
+  -d '{"id":1,"username":"nuevo","password":"x","email":"e@e.com","is_active":true}'
+
+Eliminar usuario
+curl -X DELETE http://127.0.0.1:8000/users/1
+
+Login (form-data)
+curl -X POST -F "username=t" -F "password=p" http://127.0.0.1:8000/login
+
+Script de fuerza bruta — bruteforce_api_local.sh
+Propósito: generar combinaciones de contraseñas y probarlas contra POST /login en localhost. El script valida que el TARGET sea 127.0.0.1 / localhost / ::1.
+
+Uso rápido
 chmod +x bruteforce_api_local.sh
-Uso
-bash
-Copiar código
 ./bruteforce_api_local.sh <usuario> <max_len> [alphabet] [print_every]
+
+Parámetros
+
 Parámetro	Descripción	Ejemplo
-usuario	Nombre del usuario objetivo	test1
+usuario	Usuario objetivo	test1
 max_len	Longitud máxima de contraseña a probar (entero)	4
 alphabet	digits | alpha | all (por defecto digits)	digits
 print_every	Mostrar estado cada N intentos (por defecto 1000)	500
 
 Ejemplo:
 
-bash
-Copiar código
 ./bruteforce_api_local.sh test1 4 digits 500
-Interpretación de códigos HTTP
-200 — login exitoso (script lo marca como encontrado).
-
-401 — credenciales incorrectas.
-
-403 — usuario inactivo.
-
-000 — fallo en la conexión o timeout.
+Interpretación rápida de códigos HTTP
+Código	Significado
+200	Login exitoso (ataque: contraseña encontrada)
+401	Credenciales incorrectas
+403	Usuario inactivo
+000	Fallo de conexión / timeout
 
 Riesgos y recomendaciones de seguridad
-Resumen: el ejemplo es pedagógico; no use este diseño en producción sin aplicar las medidas listadas abajo.
+Resumen: este proyecto es pedagógico. No usar en producción sin aplicar medidas de seguridad.
 
-Medidas críticas (mínimas a implementar antes de producción)
-Medida	Por qué	Nivel (imprescindible/altamente recomendado)
-Hashing de contraseñas (bcrypt/Argon2)	Evita exposición de credenciales si la BD se filtra	Imprescindible
-Rate limiting por IP/usuario	Reduce la velocidad de ataques automatizados	Imprescindible
-Bloqueo temporal tras N intentos	Previene enumeración/ataques continuos	Altamente recomendado
+Medidas críticas (mínimas antes de producción)
+Medida	Por qué	Prioridad
+Hashing de contraseñas (bcrypt/Argon2)	Evita exposición si la BD se filtra	Imprescindible
+Rate limiting (por IP/usuario)	Reduce velocidad de ataques automatizados	Imprescindible
+Bloqueo temporal tras N intentos	Evita ataques continuos / enumeración	Altamente recomendado
 HTTPS/TLS	Cifra credenciales en tránsito	Imprescindible
-Registro y alertas	Detección y respuesta temprana a ataques	Altamente recomendado
-Separar entornos (dev/test/prod)	Evitar impacto en producción durante pruebas	Altamente recomendado
+Logging y alertas	Detección temprana de actividad sospechosa	Altamente recomendado
+Separar entornos (dev/test/prod)	Evita impacto en producción durante pruebas	Altamente recomendado
+
+Parámetros de endurecimiento sugeridos (ejemplo)
+Parámetro	Valor sugerido
+Intentos fallidos antes de bloqueo	5
+Duración bloqueo inicial	15 minutos
+Política de backoff	Exponencial (doblar espera por bloqueos sucesivos)
+Límite por IP	20 req/min (ajustable según carga)
+Hashing	bcrypt (cost >= 12) o Argon2
 
 Ejemplo de hashing con passlib (Python)
 python
-Copiar código
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -141,52 +155,38 @@ hashed = pwd_context.hash("mi_password")
 if pwd_context.verify("intento", hashed):
     # contraseña correcta
     pass
-Mejoras sugeridas (ejercicios prácticos)
-Persistencia con SQLite (sqlmodel o sqlite3) en lugar de lista en memoria.
-
-Almacenar password hasheada (ver arriba).
-
-Implementar rate limiting (por IP y por usuario).
-
-Contador y bloqueo temporal tras N intentos fallidos (p. ej. 5 intentos ⇒ bloqueo 15 min).
-
-Cambiar POST /login para devolver tokens (JWT) en lugar de mensajes simples.
-
-Añadir logs y endpoint de auditoría (solo admin).
-
-Tests automáticos con pytest para endpoints principales y mitigaciones.
+Mejoras sugeridas (prioridad)
+Prioridad	Mejora
+Alta	Persistencia con SQLite (sqlmodel / sqlite3) y almacenar passwords hasheadas
+Alta	Implementar middleware de rate-limiting
+Media	Contador y bloqueo por intentos fallidos (persistente)
+Media	Autenticación con tokens (JWT)
+Baja	Endpoint de auditoría / métricas (solo admin)
+Baja	Tests automatizados con pytest
 
 Comandos útiles (resumen)
-Instalación y entorno:
-
-bash
-Copiar código
+Crear entorno e instalar dependencias
 python -m venv venv
-source venv/bin/activate        # Linux/macOS
-# .\venv\Scripts\Activate.ps1   # Windows PowerShell
+# Linux/macOS
+source venv/bin/activate
+# Windows (PowerShell)
+# .\venv\Scripts\Activate.ps1
+
 pip install --upgrade pip
 pip install fastapi uvicorn
-Ejecutar API:
 
-bash
-Copiar código
+Ejecutar API
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
-Ejecutar script de fuerza bruta:
 
-bash
-Copiar código
+Ejecutar script de fuerza bruta
 chmod +x bruteforce_api_local.sh
 ./bruteforce_api_local.sh test1 4 digits 500
-Git (agregar README y .gitignore, commit y push):
 
-bash
-Copiar código
+Git (agregar, commit y push)
 git add README.md .gitignore main.py bruteforce_api_local.sh
-git commit -m "Agregar README, .gitignore, API y script de prueba"
-# Primero sincronizar cambios remotos (si aplica)
-git pull --rebase origin main
+git commit -m "Actualizar README y añadir API y script de prueba"
+git pull --rebase origin main   # sincronizar antes de push si el remoto tiene cambios
 git push -u origin main
+
 Créditos
 Diego Ruiz
-
-Copiar código
